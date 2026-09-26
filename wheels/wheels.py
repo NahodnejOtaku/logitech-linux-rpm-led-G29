@@ -1,10 +1,11 @@
 from wheels.protocols import HIDClassic
 from wheels.protocols import HIDpp
+from wheels.sysfs_backend import SysfsG29
 
 class G27(HIDClassic):
     PRODUCT_IDS = (0xC294, 0xC29B)   # Driving Force Compatibility/Native variant
 
-class G29(HIDClassic):
+class G29(SysfsG29):
     PRODUCT_IDS = (0xC24F, 0xC260)   # PS3 / PS4 variants
 
 class G923xbox(HIDpp):

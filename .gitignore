@@ -5,3 +5,4 @@ __pycache__/
 scs-plugin/*.dll
 scs-plugin/*.so
 assetto-wrapper/*.exe
+/.idea

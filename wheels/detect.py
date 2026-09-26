@@ -7,6 +7,7 @@ from wheels.wheels import GPROps4
 from wheels.wheels import RS50
 from wheels.base import BaseWheel
 from wheels.hid_backend import enumerate_devices
+from wheels.sysfs_backend import find_g29_leds
 
 # Register every VID/PID with its class
 DEVICE_MAP: dict[tuple[int, int], type[BaseWheel]] = {}
@@ -28,6 +29,34 @@ def find_wheel_with_failures() -> tuple[BaseWheel | None, list[WheelFailure]]:
     permission" need different advice, and only the caller can display it.
     """
     failures: list[WheelFailure] = []
+
+    # G29: prefer the Linux LED class interface. This allows the RPM LEDs
+    # to be controlled without opening the HID interface of the wheel.
+    g29_leds, g29_product = find_g29_leds()
+    if g29_leds:
+        wheel = G29()
+        product_id = int(g29_product, 16) if g29_product else None
+
+        if wheel.connect(product_id):
+            print(f"✔  G29 detected ({hex(product_id) if product_id else 'sysfs'})")
+            return wheel, []
+
+        failures.append((
+            "G29",
+            product_id or 0,
+            wheel.last_error
+        ))
+
+        # Do NOT fall back to HID for a G29 whose sysfs interface exists.
+        # Otherwise, this application could still claim the wheel.
+        for name, failed_product_id, error in failures:
+            print(
+                f"✖  {name} ({hex(failed_product_id)}) "
+                f"was found but could not be opened: {error}"
+            )
+
+        return None, failures
+
     for dev in enumerate_devices():
         cls = DEVICE_MAP.get((dev['vendor_id'], dev['product_id']))
         if not cls:
