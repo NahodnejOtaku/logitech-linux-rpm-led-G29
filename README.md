@@ -1,3 +1,6 @@
+# Why this fork
+Original version disconnects the wheel driver on Logitech G29 and the games and system don't detect the wheel anymore. This is a quick AI generated fix (hence not a pull request on the original repository). It uses the fact that current driver for this wheel adds makes all the LEDs accessible via sysfs. You are encouraged to use this fork as inspiration for the actual fix. I left rest of this README untouched.
+
 # Logitech RPM LED Indicator (Linux)
 
 Enable the RPM shift LEDs on a Logitech steering wheel while playing supported racing games on Linux.
